@@ -4,7 +4,7 @@
   "description": "[初めてのGraphQL](https://www.oreilly.co.jp/books/9784873118932/) のハンズオンリポジトリ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon -e js,json,graphql"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,8 @@
   "dependencies": {
     "apollo-server": "^3.10.2",
     "graphql": "^16.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
