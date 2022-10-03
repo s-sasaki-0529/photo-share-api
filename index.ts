@@ -1,6 +1,7 @@
 import { ApolloServer, Config } from "apollo-server";
 import { ExpressContext } from "apollo-server-express";
 import { createPhotos, createTags, createUsers } from "./src/seeds";
+import { GraphQLScalarType } from "graphql";
 
 let _id = 0;
 const users = createUsers();
@@ -8,6 +9,8 @@ const photos: any[] = createPhotos();
 const tags = createTags();
 
 const typeDefs: Config<ExpressContext>["typeDefs"] = `
+  scalar DateTime
+
   enum PhotoCategory {
     SELFIE
     PORTRAIT
@@ -38,11 +41,12 @@ const typeDefs: Config<ExpressContext>["typeDefs"] = `
     category: PhotoCategory
     postedBy: User!
     taggedUsers: [User!]!
+    created: DateTime!
   }
 
   type Query {
     totalPhotos: Int!
-    allPhotos: [Photo!]!
+    allPhotos(after: DateTime): [Photo!]!
     allUsers: [User!]!
   }
 
@@ -54,16 +58,21 @@ const typeDefs: Config<ExpressContext>["typeDefs"] = `
 const resolvers: Config<ExpressContext>["resolvers"] = {
   Query: {
     totalPhotos: () => photos.length,
-    allPhotos: () => photos,
+    allPhotos: (parent, args) => {
+      return photos.filter((p) => new Date(p.created) > args.after);
+    },
     allUsers: () => users,
   },
   Mutation: {
     postPhoto: (parent, args) => {
       const newPhoto = {
         id: _id++,
+        githubUser: args.input.name,
+        created: new Date(),
         ...args.input,
       };
       photos.push(newPhoto);
+      console.log(photos);
       return newPhoto;
     },
   },
@@ -88,6 +97,13 @@ const resolvers: Config<ExpressContext>["resolvers"] = {
         .map((t) => photos.find((p) => p.id === t.photoID));
     },
   },
+  DateTime: new GraphQLScalarType({
+    name: "DateTime",
+    description: "A valid date time value.",
+    parseValue: (value: any) => new Date(value),
+    serialize: (value: any) => new Date(value).toISOString(),
+    parseLiteral: (ast: any) => ast.value,
+  }),
 };
 
 const server = new ApolloServer({
