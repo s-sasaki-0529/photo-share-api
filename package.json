@@ -1,0 +1,20 @@
+{
+  "name": "photo-share-api",
+  "version": "1.0.0",
+  "description": "[初めてのGraphQL](https://www.oreilly.co.jp/books/9784873118932/) のハンズオンリポジトリ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s-sasaki-0529/photo-share-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/s-sasaki-0529/photo-share-api/issues"
+  },
+  "homepage": "https://github.com/s-sasaki-0529/photo-share-api#readme"
+}
