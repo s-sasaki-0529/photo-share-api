@@ -5,11 +5,26 @@ let _id = 0;
 const photos: Photo[] = [];
 
 const typeDefs: Config<ExpressContext>["typeDefs"] = `
+  enum PhotoCategory {
+    SELFIE
+    PORTRAIT
+    ACTION
+    LANDSCAPE
+    GRAPHIC
+  }
+
+  input PostPhotoInput {
+    name: String!
+    description: String
+    category: PhotoCategory=PORTRAIT
+  }
+
   type Photo {
     id: ID!
     url: String!
     name: String!
     description: String
+    category: PhotoCategory
   }
 
   type Query {
@@ -18,7 +33,7 @@ const typeDefs: Config<ExpressContext>["typeDefs"] = `
   }
 
   type Mutation {
-    postPhoto(name: String! description: String): Photo!
+    postPhoto(input: PostPhotoInput!): Photo!
   }
 `;
 
@@ -28,10 +43,10 @@ const resolvers: Config<ExpressContext>["resolvers"] = {
     allPhotos: () => photos,
   },
   Mutation: {
-    postPhoto: (parent, args: Pick<Photo, "name" | "description">) => {
+    postPhoto: (parent, args: { input: PostPhotoInput }) => {
       const newPhoto: Photo = {
         id: _id++,
-        ...args,
+        ...args.input,
       };
       photos.push(newPhoto);
       return newPhoto;
