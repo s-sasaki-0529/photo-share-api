@@ -31,12 +31,14 @@ const resolvers: Config<ExpressContext>["resolvers"] = {
     postPhoto: (parent, args: Pick<Photo, "name" | "description">) => {
       const newPhoto: Photo = {
         id: _id++,
-        url: "dummy",
         ...args,
       };
       photos.push(newPhoto);
       return newPhoto;
     },
+  },
+  Photo: {
+    url: (parent) => `http://yoursite.com/img/${parent.id}.jpg`,
   },
 };
 
