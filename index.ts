@@ -1,10 +1,11 @@
 import { ApolloServer, Config } from "apollo-server";
 import { ExpressContext } from "apollo-server-express";
-import { createPhotos, createUsers } from "./src/seeds";
+import { createPhotos, createTags, createUsers } from "./src/seeds";
 
 let _id = 0;
 const users = createUsers();
 const photos: any[] = createPhotos();
+const tags = createTags();
 
 const typeDefs: Config<ExpressContext>["typeDefs"] = `
   enum PhotoCategory {
@@ -26,6 +27,7 @@ const typeDefs: Config<ExpressContext>["typeDefs"] = `
     name: String
     avatar: String
     postedPhotos: [Photo!]!
+    inPhotos: [Photo!]!
   }
 
   type Photo {
@@ -35,6 +37,7 @@ const typeDefs: Config<ExpressContext>["typeDefs"] = `
     description: String
     category: PhotoCategory
     postedBy: User!
+    taggedUsers: [User!]!
   }
 
   type Query {
@@ -69,10 +72,20 @@ const resolvers: Config<ExpressContext>["resolvers"] = {
     postedBy: (parent) => {
       return users.find((u) => u.githubLogin === parent.githubUser);
     },
+    taggedUsers: (parent) => {
+      return tags
+        .filter((t) => t.photoID === parent.id)
+        .map((t) => users.find((u) => u.githubLogin === t.userID));
+    },
   },
   User: {
     postedPhotos: (parent) => {
       return photos.filter((p) => p.githubUser === parent.githubLogin);
+    },
+    inPhotos: (parent) => {
+      return tags
+        .filter((t) => t.userID === parent.githubLogin)
+        .map((t) => photos.find((p) => p.id === t.photoID));
     },
   },
 };
