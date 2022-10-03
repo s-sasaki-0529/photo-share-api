@@ -1,12 +1,13 @@
-const { ApolloServer } = require("apollo-server");
+import { ApolloServer, Config } from "apollo-server";
+import { ExpressContext } from "apollo-server-express";
 
-const typeDefs = `
+const typeDefs: Config<ExpressContext>["typeDefs"] = `
   type Query {
     totalPhotos: Int!
   }
 `;
 
-const resolvers = {
+const resolvers: Config<ExpressContext>["resolvers"] = {
   Query: {
     totalPhotos: () => 42,
   },
