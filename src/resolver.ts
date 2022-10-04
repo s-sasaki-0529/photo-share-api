@@ -1,7 +1,10 @@
 import { GraphQLScalarType } from "graphql";
 import { Db } from "mongodb";
+import { authorizeWithGithub } from "./github";
+import * as dotenv from "dotenv";
 
 let _id = 100;
+dotenv.config();
 
 export const resolvers = {
   Query: {
@@ -21,6 +24,30 @@ export const resolvers = {
     },
   },
   Mutation: {
+    githubAuth: async (parent, args: { code: string }, context: { db: Db }) => {
+      const { message, access_token, avatar_url, login, name } =
+        await authorizeWithGithub({
+          client_id: process.env.GITHUB_CLIENT_ID!,
+          client_secret: process.env.GITHUB_CLIENT_SECRET!,
+          code: args.code,
+        });
+
+      if (message) {
+        throw new Error(message);
+      }
+
+      const latestUserInfo = {
+        name,
+        githubLogin: login,
+        githubToken: access_token,
+        avatar: avatar_url,
+      };
+
+      const ops = await context.db
+        .collection("users")
+        .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true });
+      return { user: latestUserInfo, token: access_token };
+    },
     postPhoto: async (parent, args, context: { db: Db }) => {
       const newPhoto = {
         id: _id++,
