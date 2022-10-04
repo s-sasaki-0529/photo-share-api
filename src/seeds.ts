@@ -1,47 +1,47 @@
 export const createUsers = () => [
   {
-    githubLogin: "mHattrup",
-    name: "Mike Hattrup",
+    githubLogin: "A",
+    name: "Aさん",
   },
   {
-    githubLogin: "gPlake",
-    name: "Glen Plake",
+    githubLogin: "B",
+    name: "Bさん",
   },
   {
-    githubLogin: "sSchmidt",
-    name: "Scot Schmidt",
+    githubLogin: "C",
+    name: "Cさん",
   },
 ];
 
 export const createPhotos = () => [
   {
     id: 1,
-    name: "Dropping the Heart Chute",
-    description: "The heart chute is one of my favorite chutes",
+    name: "Aさんの写真",
+    description: "Aさんの写真の説明文",
     category: "ACTION",
-    githubUser: "gPlake",
+    githubUser: "A",
     created: "3-28-1977",
   },
   {
     id: 2,
-    name: "Enjoying the sunshine",
+    name: "Bさんの写真",
     category: "SELFIE",
-    githubUser: "sSchmidt",
+    githubUser: "B",
     created: "1-2-1985",
   },
   {
     id: 3,
-    name: "Gunbarrel 25",
-    description: "25 laps on gunbarrel today",
+    name: "Cさんの写真",
+    description: "Cさんの写真の説明文",
     category: "LANDSCAPE",
-    githubUser: "sSchmidt",
+    githubUser: "C",
     created: "2018-04-15T19:09:57.308Z",
   },
 ];
 
 export const createTags = () => [
-  { photoID: 1, userID: "gPlake" },
-  { photoID: 2, userID: "sSchmidt" },
-  { photoID: 2, userID: "mHattrup" },
-  { photoID: 2, userID: "gPlake" },
+  { photoID: 1, userID: "A" },
+  { photoID: 2, userID: "A" },
+  { photoID: 2, userID: "B" },
+  { photoID: 2, userID: "C" },
 ];
