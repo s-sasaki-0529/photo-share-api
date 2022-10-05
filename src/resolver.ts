@@ -51,19 +51,25 @@ export const resolvers = {
         .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true });
       return { user: latestUserInfo, token: access_token };
     },
-    postPhoto: async (parent, args, context: { db: Db }) => {
+    postPhoto: async (parent, args, context: { currentUser; db: Db }) => {
+      if (!context.currentUser) {
+        throw new Error("only an authorized user can post a photo");
+      }
       const newPhoto = {
-        id: _id++,
-        githubUser: "C",
+        githubUser: context.currentUser.githubLogin,
         created: new Date(),
         ...args.input,
       };
-      await context.db.collection("photos").insertOne(newPhoto);
+      const { insertedId } = await context.db
+        .collection("photos")
+        .insertOne(newPhoto);
+      newPhoto.id = insertedId;
       return newPhoto;
     },
   },
   Photo: {
-    url: (parent) => `http://yoursite.com/img/${parent.id}.jpg`,
+    id: (parent) => parent.id || parent._id,
+    url: (parent) => `http://yoursite.com/img/${parent._id}.jpg`,
     postedBy: async (parent, args, { db }) => {
       return db.collection("users").findOne({ githubLogin: parent.githubUser });
     },
