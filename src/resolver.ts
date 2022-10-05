@@ -8,6 +8,9 @@ dotenv.config();
 
 export const resolvers = {
   Query: {
+    me: (parent, args, { currentUser }) => {
+      return currentUser;
+    },
     totalPhotos: (parent, args, { db }) => {
       return db.collection("photos").estimatedDocumentCount();
     },

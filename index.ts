@@ -8,7 +8,7 @@ import { connectMongoDb, seedToMongoDb } from "./src/mongodb";
 async function start() {
   // mongodb セットアップ
   const db = await connectMongoDb();
-  await seedToMongoDb();
+  // await seedToMongoDb();
 
   // express サーバーのセットアップ
   const app = express();
@@ -24,7 +24,17 @@ async function start() {
   const server = new ApolloServer({
     typeDefs: loadTypeDefs(),
     resolvers,
-    context: { db },
+    context: async ({ req }) => {
+      const githubToken = req.headers["authorization"];
+      if (githubToken) {
+        const currentUser = await db
+          .collection("users")
+          .findOne({ githubToken });
+        return { db, currentUser };
+      } else {
+        return { db, currentUser: null };
+      }
+    },
   });
   await server.start();
   server.applyMiddleware({ app });
