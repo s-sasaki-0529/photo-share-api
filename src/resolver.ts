@@ -2,6 +2,7 @@ import { GraphQLScalarType } from "graphql";
 import { Db } from "mongodb";
 import { authorizeWithGithub } from "./github";
 import * as dotenv from "dotenv";
+import fetch from "node-fetch";
 
 let _id = 100;
 dotenv.config();
@@ -50,6 +51,30 @@ export const resolvers = {
         .collection("users")
         .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true });
       return { user: latestUserInfo, token: access_token };
+    },
+    addFakeUsers: async (root, { count }, context: { db: Db }) => {
+      const randomUserApi = `https://randomuser.me/api/?results=${count}`;
+      const { results } = await fetch(randomUserApi).then((res) => res.json());
+      const users = results.map((r: any) => ({
+        githubLogin: r.login.username,
+        name: `${r.name.first} ${r.name.last}`,
+        avatar: r.picture.thumbnail,
+        githubToken: r.login.sha1,
+      }));
+      await context.db.collection("users").insertMany(users);
+      return users;
+    },
+    fakeUserAuth: async (parent, { githubLogin }, context: { db: Db }) => {
+      const user = await context.db
+        .collection("users")
+        .findOne({ githubLogin });
+      if (!user) {
+        throw new Error(`Cannot find user with githubLogin "${githubLogin}"`);
+      }
+      return {
+        token: user.githubToken,
+        user,
+      };
     },
     postPhoto: async (parent, args, context: { currentUser; db: Db }) => {
       if (!context.currentUser) {
