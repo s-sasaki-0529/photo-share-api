@@ -15,6 +15,9 @@ export const resolvers = {
     totalPhotos: (parent, args, { db }) => {
       return db.collection("photos").estimatedDocumentCount();
     },
+    totalUsers: (parent, args, { db }) => {
+      return db.collection("users").estimatedDocumentCount();
+    },
     allPhotos: async (parent, args, { db }) => {
       const photos = await db.collection("photos").find().toArray();
       if (args.after) {
